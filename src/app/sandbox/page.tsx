@@ -1,0 +1,36 @@
+import { mockFiles, mockFolders } from "~/lib/mock-data";
+import { db } from "~/server/db";
+import { files_table, folders_table } from "~/server/db/schema";
+
+export default function SandboxPage() {
+  return (
+    <div className="flex flex-col gap-4">
+      Seed function
+      <form
+        action={async () => {
+          "use server";
+
+          await db.insert(folders_table).values(
+            mockFolders.map((folder, index) => ({
+              name: folder.name,
+              id: index + 1,
+              parent: index !== 0 ? 1 : null,
+            })),
+          );
+
+          await db.insert(files_table).values(
+            mockFiles.map((file, index) => ({
+              name: file.name,
+              size: 50000,
+              url: file.url,
+              id: index + 1,
+              parent: (index % 3) + 1,
+            })),
+          );
+        }}
+      >
+        <button type="submit">Seed</button>
+      </form>
+    </div>
+  );
+}
