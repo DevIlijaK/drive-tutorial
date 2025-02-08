@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import DriveContents from "~/app/drive-contents";
 import { db } from "~/server/db";
-import { files_table, folders_table } from "~/server/db/schema";
+import { QUERIES } from "~/server/db/queries";
+import { folders_table } from "~/server/db/schema";
 
 async function getAllParents(folderId: number) {
   const parents = [];
@@ -29,21 +30,20 @@ export default async function GoogleDriveClone(props: {
     return <div>Invalid folder ID</div>;
   }
 
-  const filesPromise = db
-    .select()
-    .from(files_table)
-    .where(eq(files_table.parent, paresedFolderId));
-  const foldersPromise = db
-    .select()
-    .from(folders_table)
-    .where(eq(folders_table.parent, paresedFolderId));
-  const parentsPromise = getAllParents(paresedFolderId);
-
   const [folders, files, parents] = await Promise.all([
-    foldersPromise,
-    filesPromise,
-    parentsPromise,
+    QUERIES.getFolders(paresedFolderId),
+    QUERIES.getFilesByParent(paresedFolderId),
+    QUERIES.getAllParentsForFolder(paresedFolderId),
   ]);
 
-  return <DriveContents files={files} folders={folders} parents={parents} />;
+  console.log({ folders, files, parents });
+
+  return (
+    <DriveContents
+      files={files}
+      folders={folders}
+      parents={parents}
+      currentFolderId={paresedFolderId}
+    />
+  );
 }

@@ -1,38 +1,20 @@
 "use client";
 
-import { ChevronRight, Upload } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { ChevronRight } from "lucide-react";
 import { FileRow, FolderRow } from "./file-row";
-import { DB_FileType, DB_FolderType } from "~/server/db/schema";
 import Link from "next/link";
+import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
+import { UploadButton } from "~/components/uploadthing";
+import { useRouter } from "next/navigation";
 
 export default function DriveContents(props: {
-  files: DB_FileType[];
-  folders: DB_FolderType[];
-  parents: DB_FolderType[];
+  files: any[];
+  folders: any[];
+  parents: any[];
+  currentFolderId: number;
 }) {
+  const router = useRouter();
   const { files, folders, parents } = props;
-
-  // const breadcrumbs = useMemo(() => {
-  //   const breadcrumbs = [];
-  //   let currentId = currentFolder;
-
-  //   while (currentId !== 1) {
-  //     const folder = folders.find((folder) => folder.id === currentId);
-  //     if (folder) {
-  //       breadcrumbs.unshift(folder);
-  //       currentId = folder.parent ?? 1;
-  //     } else {
-  //       break;
-  //     }
-  //   }
-
-  //   return breadcrumbs;
-  // }, [currentFolder, folders]);
-
-  const handleUpload = () => {
-    alert("Upload functionality would be implemented here");
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 p-8 text-gray-100">
@@ -54,13 +36,12 @@ export default function DriveContents(props: {
               </div>
             ))}
           </div>
-          <Button
-            onClick={handleUpload}
-            className="bg-blue-600 text-white hover:bg-blue-700"
-          >
-            <Upload className="mr-2" size={20} />
-            Upload
-          </Button>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
         </div>
         <div className="rounded-lg bg-gray-800 shadow-xl">
           <div className="border-b border-gray-700 px-6 py-4">
@@ -79,6 +60,13 @@ export default function DriveContents(props: {
             ))}
           </ul>
         </div>
+        <UploadButton
+          endpoint="imageUploader"
+          onClientUploadComplete={() => {
+            router.refresh();
+          }}
+          input={{ folderId: props.currentFolderId }}
+        />
       </div>
     </div>
   );

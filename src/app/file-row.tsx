@@ -1,8 +1,7 @@
 import { Folder as FolderIcon, FileIcon } from "lucide-react";
 import Link from "next/link";
-import { DB_FileType, DB_FolderType } from "~/server/db/schema";
 
-export const FileRow = (props: { file: DB_FileType }) => {
+export const FileRow = (props: { file: any }) => {
   const { file } = props;
   return (
     <li
@@ -26,7 +25,7 @@ export const FileRow = (props: { file: DB_FileType }) => {
   );
 };
 
-export const FolderRow = (props: { folder: DB_FolderType }) => {
+export const FolderRow = (props: { folder: any }) => {
   const { folder } = props;
   return (
     <li
